@@ -9,13 +9,17 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, WeiboSDKDelegate {
 
     var window: UIWindow?
+    
+    let appKey = "2573034015"
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        WeiboSDK.enableDebugMode(true)
+        WeiboSDK.registerApp(appKey)
         return true
     }
 
@@ -40,7 +44,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        return WeiboSDK.handleOpenURL(url, delegate: self)
+    }
 
+    func didReceiveWeiboRequest(request: WBBaseRequest!) {
+        if (request.isKindOfClass(WBProvideMessageForWeiboRequest)) {
+            
+        }
+    }
+    
+    func didReceiveWeiboResponse(response: WBBaseResponse!) {
+        if (response.isKindOfClass(WBSendMessageToWeiboResponse)) {
+            let message = "响应状态:\(response.statusCode.rawValue)\n响应UserInfo数据:\(response.userInfo)\n原请求UserInfo数据:\(response.requestUserInfo)"
+            let alert = UIAlertView(title: "发送结果", message: message, delegate: nil, cancelButtonTitle: "确定")
+            alert.show()
+        } else if (response.isKindOfClass(WBAuthorizeResponse)) {
+            let message = "响应状态: \(response.statusCode.rawValue)\nresponse.userId: \((response as! WBAuthorizeResponse).userID)\nresponse.accessToken: \((response as! WBAuthorizeResponse).accessToken)\n响应UserInfo数据: \(response.userInfo)\n原请求UserInfo数据: \(response.requestUserInfo)"
+            let alert = UIAlertView(title: "认证结果", message: message, delegate: nil, cancelButtonTitle: "确定")
+            alert.show()
+        }
+    }
 
 }
 

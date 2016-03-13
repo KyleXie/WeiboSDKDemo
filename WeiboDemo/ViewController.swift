@@ -7,8 +7,18 @@
 //
 
 import UIKit
+let redirectURI = "https://api.weibo.com/oauth2/default.html"
 
 class ViewController: UIViewController {
+    @IBOutlet weak var loginBtn: UIButton!
+
+    @IBAction func onLoginBtn(sender: AnyObject) {
+        let request = WBAuthorizeRequest.request() as? WBAuthorizeRequest
+        request?.redirectURI = redirectURI
+        request?.scope = "all"
+        
+        WeiboSDK.sendRequest(request)
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
